@@ -1,5 +1,6 @@
 from SDNAuctioning.Bid import Bid
 from SDNAuctioning.Operator import InfrastructureOperator
+from SDNAuctioning.Operator import NetworkOperator
 from SDNAuctioning import SDNAuction
 from Network.Graph import Graph
 from Network.Node import Node
@@ -306,6 +307,8 @@ def auctioning(bids, operator):
 def main():
 
     num_bids = 10
+    num_operators = 10
+    operators = []
     bids = []
     topology = Graph()
 
@@ -315,16 +318,23 @@ def main():
     create_network_topology(topology, num_vnf_services=5)
 
     # Resource advertisement phase
-    operator1 = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=5, service_capacity=100, topology=topology)
+    infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=5,
+                                            service_capacity=100, topology=topology)
 
-    # TODO criar as operadoras (numero de bids vai ser numero de operadoras 5g)
+    # Operators creation phase
+    for i in range(num_operators):
+        operators.append(NetworkOperator(id="operator" + str(i), topology=infra_operator))
 
-    # Bidding phase
-    bidding(bids=bids, num_bids=num_bids, operator=operator1, topology=topology)
+    # Clients creation phase
 
+    # Update Operator with client's demands
+
+    # 1st Auction
     # Winner determination & price computation phase
     # TODO ao invés de bids bota NetworkOperator.bids
-    auctioning(bids=bids, operator=operator1)
+    for i in range(num_operators):
+        bids.append(operators[i].bids)
+    auctioning(bids=bids, operator=infra_operator)
 
     # VNF instantiation phase
 

@@ -29,19 +29,16 @@ class InfrastructureOperator:
 
 
 class NetworkOperator:
-    name = "default"
     clients_demands = []
     bids = []
 
-
-    def __init__(self, topology):
+    def __init__(self, id, topology):
+        self.id = id
         self.topology = topology
-        self.add_clients_demands()
-        self.create_bids()
 
-    def add_clients_demands(self):
-        # TODO um for criando clientes dessa operadora
-        self.clients_demands.append(#TODO)
-
-    def create_bids(self):
-        self.bids.append(#TODO)
+    # def add_clients_demands(self):
+    #     # TODO um for criando clientes dessa operadora
+    #     self.clients_demands.append(#TODO)
+    #
+    # def create_bids(self):
+    #     self.bids.append(#TODO)
