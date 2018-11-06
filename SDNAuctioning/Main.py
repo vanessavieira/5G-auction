@@ -1,7 +1,7 @@
 from SDNAuctioning.Bid import Bid
 from SDNAuctioning.Operator import InfrastructureOperator
 from SDNAuctioning.Operator import NetworkOperator
-from SDNAuctioning import SDNAuction
+from SDNAuctioning import Auction
 from Network.Graph import Graph
 from Network.Node import Node
 from Network.Edge import Edge
@@ -302,8 +302,9 @@ def bidding(bids, num_bids, operator, topology):
 
 
 def auctioning(bids, operator):
-    SDNAuction.SDNAuction(bids, operator)
+    auction = Auction.SDNAuction(bids, operator)
     bids.clear()
+    return auction
 
 
 def main():
@@ -322,7 +323,7 @@ def main():
 
     # Resource advertisement phase
     infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=10,
-                                            service_capacity=700, topology=topology)
+                                            service_capacity=600, topology=topology)
 
     # Operators creation + clients creation + operator's update demands phases
     # 1400. 2800. 5600. 11200. 28000. Divided by num_operators
@@ -333,11 +334,19 @@ def main():
 
     bids = list(itertools.chain(*bids))
 
-    # 1st Auction
     # Winner determination & price computation phase
-    auctioning(bids=bids, operator=infra_operator)
+    SDNauction = auctioning(bids=bids, operator=infra_operator)
 
-    # VNF instantiation phase
+    # SECOND AUCTION #
+
+    num_one_winning_bid = SDNauction.winners[0]
+
+    for i in range(num_operators):
+        if num_one_winning_bid.network_operator == operators[i].id:
+            num_one_winning_operator = operators[i]
+
+    Auction.HubAuction(operator=num_one_winning_operator, clients=num_one_winning_operator.clients)
+
 
 if __name__ == "__main__":
     main()

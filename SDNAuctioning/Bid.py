@@ -20,8 +20,8 @@ class Bid:
     valuation = 0
     sort_metric = 0
 
-    def __init__(self, client, operator, topology, num_clients):
-        self.client = client
+    def __init__(self, network_operator, operator, topology, num_clients):
+        self.network_operator = network_operator
         self.operator = operator
         self.topology = topology
         self.num_clients = num_clients
