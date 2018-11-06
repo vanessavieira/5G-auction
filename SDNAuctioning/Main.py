@@ -5,6 +5,8 @@ from SDNAuctioning import SDNAuction
 from Network.Graph import Graph
 from Network.Node import Node
 from Network.Edge import Edge
+from random import randint
+import itertools
 
 
 def create_network_topology(topology, num_vnf_services):
@@ -307,33 +309,32 @@ def auctioning(bids, operator):
 def main():
 
     num_bids = 10
-    num_operators = 10
+    num_clients = 280
+    num_operators = 5
     operators = []
     bids = []
     topology = Graph()
 
-    ### FIRST AUCTION
+    # FIRST AUCTION #
 
     # Create network topology
-    create_network_topology(topology, num_vnf_services=5)
+    create_network_topology(topology, num_vnf_services=10)
 
     # Resource advertisement phase
-    infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=5,
-                                            service_capacity=100, topology=topology)
+    infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=10,
+                                            service_capacity=700, topology=topology)
 
-    # Operators creation phase
+    # Operators creation + clients creation + operator's update demands phases
+    # 1400. 2800. 5600. 11200. 28000. Divided by num_operators
     for i in range(num_operators):
-        operators.append(NetworkOperator(id="operator" + str(i), topology=infra_operator))
+        operators.append(NetworkOperator(id="operator" + str(i), topology=topology,
+                                         infra_operator=infra_operator, num_clients=num_clients))
+        bids.append(operators[i].bid)
 
-    # Clients creation phase
-
-    # Update Operator with client's demands
+    bids = list(itertools.chain(*bids))
 
     # 1st Auction
     # Winner determination & price computation phase
-    # TODO ao invés de bids bota NetworkOperator.bids
-    for i in range(num_operators):
-        bids.append(operators[i].bids)
     auctioning(bids=bids, operator=infra_operator)
 
     # VNF instantiation phase

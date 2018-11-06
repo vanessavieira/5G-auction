@@ -132,7 +132,7 @@ class SDNAuction:
         print("\nNum Bids = " + str(self.num_bids))
         print("Accepted Bids = " + str(self.accepted_bids))
         print("Market Valuation = " + str(self.market_valuation))
-        print("Operator Revenue = " + str(self.operator_revenue))
+        print("Infrastructure Revenue \n(sum of all network operator payments) = " + str(self.operator_revenue))
         print("Percentage of Accepted Bids = " + str(self.accepted_bids_percentage))
         print("Service Capacity = " + str(self.service_capacity))
         print("Mean Bid Price = " + str(self.mean_bid_price))

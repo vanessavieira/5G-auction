@@ -1,4 +1,6 @@
 import itertools
+from SDNAuctioning.Client import Client
+from SDNAuctioning.Bid import Bid
 
 
 class InfrastructureOperator:
@@ -29,16 +31,26 @@ class InfrastructureOperator:
 
 
 class NetworkOperator:
-    clients_demands = []
-    bids = []
+    bid = []
+    clients = []
 
-    def __init__(self, id, topology):
+    clients_demands_services = []
+    clients_demands_quantities = []
+
+    def __init__(self, id, topology, infra_operator, num_clients):
         self.id = id
         self.topology = topology
+        self.infra_operator = infra_operator
+        self.num_clients = num_clients
+        self.create_clients()
+        self.create_bid()
 
-    # def add_clients_demands(self):
-    #     # TODO um for criando clientes dessa operadora
-    #     self.clients_demands.append(#TODO)
-    #
-    # def create_bids(self):
-    #     self.bids.append(#TODO)
+    def create_clients(self):
+        self.clients = []
+        for i in range(self.num_clients):
+            self.clients.append(Client(self.id, self.topology, self.num_clients))
+        # print(self.clients)
+
+    def create_bid(self):
+        self.bid = []
+        self.bid.append(Bid(self.id, self.infra_operator, self.topology, self.num_clients))

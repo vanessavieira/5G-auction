@@ -8,8 +8,7 @@ from Network.Dijkstra import shortest_path
 class Bid:
     required_service_quantity = []
     total_required_service_quantity = 0
-    valuation = 0
-    sort_metric = 0
+
     input_node = 0
     output_node = 1
     shortest_node_path = []
@@ -18,10 +17,14 @@ class Bid:
     services_to_choose = []
     price_to_pay = []
 
-    def __init__(self, client, operator, topology):
+    valuation = 0
+    sort_metric = 0
+
+    def __init__(self, client, operator, topology, num_clients):
         self.client = client
         self.operator = operator
         self.topology = topology
+        self.num_clients = num_clients
         self.compute_bid_topology()
         self.compute_vnf_service_request()
         self.compute_bandwidth_service_request()
@@ -30,7 +33,7 @@ class Bid:
         self.compute_sort_metric()
 
     def compute_bid_topology(self):
-        self.input_node = randint(0, len(self.topology.nodes) - 1)
+        self.input_node = 0
         self.output_node = randint(0, len(self.topology.nodes) - 1)
 
         while self.output_node == self.input_node:
@@ -48,7 +51,7 @@ class Bid:
 
     def compute_vnf_service_request(self):
         self.services_to_choose = []
-        num_services_requested = randint(1, 7)
+        num_services_requested = randint(1, 10)
 
         for i in range(len(self.shortest_node_path)):
             self.services_to_choose.append(self.shortest_node_path[i].vnf_services)
@@ -80,7 +83,7 @@ class Bid:
     def compute_all_services_request(self):
         self.required_service_quantity = []
         for services in range(len(self.required_services)):
-            rand_quantity = randint(30, 60)
+            rand_quantity = randint(self.num_clients, self.num_clients*1.5)
             self.total_required_service_quantity += rand_quantity
             self.required_service_quantity.append(rand_quantity)
 
