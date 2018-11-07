@@ -17,6 +17,12 @@ class SDNAuction:
     mean_bid_price = 0
     accepted_bids_percentage = 0
 
+    counter_operator0 = 0
+    counter_operator1 = 0
+    counter_operator2 = 0
+    counter_operator3 = 0
+    counter_operator4 = 0
+
     def __init__(self, bids, operator):
         self.bids = bids
         self.bids_unordered = bids
@@ -117,6 +123,11 @@ class SDNAuction:
         self.accepted_bids = len(self.winners)
         self.accepted_bids_percentage = (self.accepted_bids / self.num_bids) * 100
         total_valuation = 0
+        self.counter_operator0 = 0
+        self.counter_operator1 = 0
+        self.counter_operator2 = 0
+        self.counter_operator3 = 0
+        self.counter_operator4 = 0
 
         print("\nprice size: " + str(len(self.prices)))
 
@@ -126,6 +137,17 @@ class SDNAuction:
         for j in range(len(self.winners)):
             self.market_valuation += self.winners[j].valuation
             self.operator_revenue += self.winners[j].price_to_pay
+
+            if self.winners[j].network_operator == "operator0":
+                self.counter_operator0 += 1
+            elif self.winners[j].network_operator == "operator1":
+                self.counter_operator1 += 1
+            elif self.winners[j].network_operator == "operator2":
+                self.counter_operator2 += 1
+            elif self.winners[j].network_operator == "operator3":
+                self.counter_operator3 += 1
+            elif self.winners[j].network_operator == "operator4":
+                self.counter_operator4 += 1
 
         self.mean_bid_price = self.operator_revenue / self.accepted_bids
 
@@ -137,6 +159,9 @@ class SDNAuction:
         print("Percentage of Accepted Bids = " + str(self.accepted_bids_percentage))
         print("Service Capacity = " + str(self.service_capacity))
         print("Mean Bid Price = " + str(self.mean_bid_price))
+        print("Winning operators: Op0 = " + str(self.counter_operator0) + "; Op1 = " + str(self.counter_operator1)
+              + "; Op2 = " + str(self.counter_operator2) + "; Op3 = " + str(self.counter_operator3)
+              + "; Op4 = " + str(self.counter_operator4))
 
 
 class HubAuction:

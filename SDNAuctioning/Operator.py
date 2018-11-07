@@ -1,6 +1,7 @@
 import itertools
 from SDNAuctioning.Client import Client
 from SDNAuctioning.Bid import Bid
+from random import randint
 
 
 class InfrastructureOperator:
@@ -15,6 +16,7 @@ class InfrastructureOperator:
         self.service_capacity = service_capacity
         self.calculate_num_services()
         self.calculate_services()
+        self.update_used_units()
 
     def calculate_num_services(self):
         self.num_services = self.num_links + self.num_vnf_services * self.num_nodes
@@ -29,9 +31,14 @@ class InfrastructureOperator:
 
         self.services = list(itertools.chain(*self.services))
 
+    def update_used_units(self):
+        for i in range(len(self.topology.nodes)):
+            if i != 0:
+                self.services[i].used_units = randint(100, 300)
+
 
 class NetworkOperator:
-    bid = []
+    bids = []
     clients = []
 
     clients_demands_services = []
@@ -43,14 +50,15 @@ class NetworkOperator:
         self.infra_operator = infra_operator
         self.num_clients = num_clients
         self.create_clients()
-        self.create_bid()
 
     def create_clients(self):
         self.clients = []
+        self.bids = []
         for i in range(self.num_clients):
-            self.clients.append(Client(self.id, self.topology, self.num_clients))
+            self.clients.append(Client(self.id, self.topology, self.num_clients, self.infra_operator))
+            self.bids.append(self.clients[i].bid)
         # print(self.clients)
 
-    def create_bid(self):
-        self.bid = []
-        self.bid.append(Bid(self.id, self.infra_operator, self.topology, self.num_clients))
+    # def create_bid(self):
+    #     self.bid = []
+    #     self.bid.append(Bid(self.id, self.infra_operator, self.topology, self.num_clients))

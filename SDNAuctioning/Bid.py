@@ -51,7 +51,7 @@ class Bid:
 
     def compute_vnf_service_request(self):
         self.services_to_choose = []
-        num_services_requested = randint(1, 10)
+        num_services_requested = randint(1, 3)
 
         for i in range(len(self.shortest_node_path)):
             self.services_to_choose.append(self.shortest_node_path[i].vnf_services)
@@ -83,7 +83,7 @@ class Bid:
     def compute_all_services_request(self):
         self.required_service_quantity = []
         for services in range(len(self.required_services)):
-            rand_quantity = randint(self.num_clients, self.num_clients*1.5)
+            rand_quantity = randint(1, 5)
             self.total_required_service_quantity += rand_quantity
             self.required_service_quantity.append(rand_quantity)
 
