@@ -9,6 +9,7 @@ class Bid:
     required_service_quantity = []
     total_required_service_quantity = 0
 
+    winning_bid = 0
     input_node = 0
     output_node = 1
     shortest_node_path = []
@@ -20,7 +21,8 @@ class Bid:
     valuation = 0
     sort_metric = 0
 
-    def __init__(self, network_operator, operator, topology, num_clients):
+    def __init__(self, client, network_operator, operator, topology, num_clients):
+        self.client = client
         self.network_operator = network_operator
         self.operator = operator
         self.topology = topology
@@ -90,7 +92,7 @@ class Bid:
         print("Required service quantity: " + str(self.required_service_quantity))
 
     def compute_valuation(self):
-        rand_valuation = randint(1, self.total_required_service_quantity)
+        rand_valuation = randint(1, int(self.total_required_service_quantity))
         self.valuation = rand_valuation
 
         print("Valuation: " + str(self.valuation))

@@ -55,10 +55,8 @@ class NetworkOperator:
         self.clients = []
         self.bids = []
         for i in range(self.num_clients):
-            self.clients.append(Client(self.id, self.topology, self.num_clients, self.infra_operator))
+            self.clients.append(Client("Client" + str(i) + "_" + str(self.id),
+                                       self.id, self.topology, self.num_clients, self.infra_operator))
             self.bids.append(self.clients[i].bid)
         # print(self.clients)
 
-    # def create_bid(self):
-    #     self.bid = []
-    #     self.bid.append(Bid(self.id, self.infra_operator, self.topology, self.num_clients))

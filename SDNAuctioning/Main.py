@@ -5,7 +5,7 @@ from SDNAuctioning import Auction
 from Network.Graph import Graph
 from Network.Node import Node
 from Network.Edge import Edge
-from random import randint
+import random
 import itertools
 
 
@@ -329,17 +329,17 @@ def main():
     bids = list(itertools.chain(*bids))
 
     # Winner determination & price computation phase
-    SDNauction = auctioning(bids=bids, operator=infra_operator)
+    auctioning(bids=bids, operator=infra_operator)
 
-    # # SECOND AUCTION #
-    #
-    # num_one_winning_bid = SDNauction.winners[0]
-    #
-    # for i in range(num_operators):
-    #     if num_one_winning_bid.network_operator == operators[i].id:
-    #         num_one_winning_operator = operators[i]
-    #
-    # Auction.HubAuction(operator=num_one_winning_operator, clients=num_one_winning_operator.clients)
+    for i in range(num_operators):
+        for j in range(len(operators[i].clients)):
+            operators[i].clients[j].update_client()
+
+    # SECOND AUCTION #
+
+    random_operator = random.choice(operators)
+
+    Auction.HubAuction(operator=random_operator, clients=random_operator.clients)
 
 
 if __name__ == "__main__":

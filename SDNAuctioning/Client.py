@@ -12,8 +12,10 @@ class Client:
     value = 0
     sort_metric = 0
     bid = 0
+    winning_client = 0
 
-    def __init__(self, operator_id, topology, num_clients, infra_operator):
+    def __init__(self, client_id, operator_id, topology, num_clients, infra_operator):
+        self.client_id = client_id
         self.operator_id = operator_id
         self.topology = topology
         self.num_clients = num_clients
@@ -27,13 +29,20 @@ class Client:
         self.battery = randint(10, 100)
         self.num_neighbours = randint(1, self.num_clients)
         self.storage = randint(10, 100)
-        self.value = randint(1, 100)
-
-        self.sort_metric = (self.process_power + self.battery + self.num_neighbours + self.storage)\
-                           / (self.value + self.distance_to_antenna)
+        self.value = randint(1, 50)
 
         # print("Sort metric:" + str(self.sort_metric))
 
     def compute_bid(self):
-        self.bid = Bid.Bid(self.operator_id, self.infra_operator, self.topology, self.num_clients)
+        self.bid = Bid.Bid(self.client_id, self.operator_id, self.infra_operator, self.topology, self.num_clients)
         print(self.bid)
+
+    def update_client(self):
+        if self.bid.winning_bid == 1:
+            self.winning_client = 1
+
+    def compute_sort_metric(self):
+        self.sort_metric = self.winning_client * ((self.process_power + self.battery +
+                                                   self.num_neighbours + self.storage +
+                                                   self.bid.total_required_service_quantity) /
+                                                  (self.value * self.distance_to_antenna))

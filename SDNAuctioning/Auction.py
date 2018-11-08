@@ -1,4 +1,5 @@
 import math
+import itertools
 
 
 class SDNAuction:
@@ -137,6 +138,7 @@ class SDNAuction:
         for j in range(len(self.winners)):
             self.market_valuation += self.winners[j].valuation
             self.operator_revenue += self.winners[j].price_to_pay
+            self.winners[j].winning_bid = 1
 
             if self.winners[j].network_operator == "operator0":
                 self.counter_operator0 += 1
@@ -162,12 +164,18 @@ class SDNAuction:
         print("Winning operators: Op0 = " + str(self.counter_operator0) + "; Op1 = " + str(self.counter_operator1)
               + "; Op2 = " + str(self.counter_operator2) + "; Op3 = " + str(self.counter_operator3)
               + "; Op4 = " + str(self.counter_operator4))
+        print("\n")
 
 
 class HubAuction:
 
+    antenna_services = []
+    antenna_quantities = []
+    antenna_used_units = []
+
     winners = []
     num_winners = 0
+
     num_clients_benefited = 0
     operator_costs_hubs = 0
     operator_total_costs = 0
@@ -176,36 +184,79 @@ class HubAuction:
         self.operator = operator
         self.clients = clients
         self.compute_ordered_clients()
+        self.update_antenna()
         self.compute_winners()
         self.compute_metrics()
 
     def compute_ordered_clients(self):
+        clients_without_zero = []
+        self.clients.sort(key=lambda x: x.winning_client, reverse=True)
+
+        for i in range(len(self.clients)):
+            if self.clients[i].winning_client == 0:
+                break
+            else:
+                clients_without_zero.append(self.clients[i])
+
+        self.clients = clients_without_zero
         self.clients.sort(key=lambda x: x.sort_metric, reverse=True)
-        # for i in range(len(self.clients)):
-        #     print(self.clients[i].sort_metric)
+        print("SECOND AUCTION\nNum clients: " + str(len(self.clients)))
 
-# 30% de 280 = 84
+    def update_antenna(self):
+        for i in range(len(self.clients)):
+            self.antenna_services.append(self.clients[i].bid.required_services)
+            self.antenna_quantities.append(self.clients[i].bid.required_service_quantity)
+
+        self.antenna_services = list(itertools.chain(*self.antenna_services))
+        self.antenna_quantities = list(itertools.chain(*self.antenna_quantities))
+
+        for j in range(len(self.antenna_services)):
+            self.antenna_services[j].used_units = 0
+            self.antenna_services[j].antenna_capacity = self.antenna_quantities[j]
+
     def compute_winners(self):
-        self.winners = []
-        num_clients = len(self.clients)
-        ran = num_clients * 0.3
+        for i in range(len(self.clients)):
+            num_services = len(self.clients[i].bid.required_services)
 
-        for i in range(int(ran)):
-            self.winners.append(self.clients[i])
+            count_services = 0
+            for j in range(num_services):
+
+                for k in range(len(self.antenna_services)):
+                    if self.clients[i].bid.required_services[j] == self.antenna_services[k]:
+                        # quantidade pedida * 2 pra fornecer para demais celulares
+                        if ((self.clients[i].bid.required_service_quantity[j] * 2) +
+                                self.clients[i].bid.required_services[j].used_units) <= \
+                                self.antenna_services[k].antenna_capacity:
+                            count_services += 1
+
+                if count_services == num_services:
+                    self.winners.append(self.clients[i])
+
+                    for j in range(num_services):
+                        self.clients[i].bid.required_services[j].used_units += \
+                            self.clients[i].bid.required_service_quantity[j]
+
+        for i in range(len(self.winners)):
+            print("Winner: " + str(self.winners[i].client_id) + "; value: " + str(self.winners[i].value))
+
+        # print("Num winners: " + str(len(self.winners)))
+        print("\n")
 
     def compute_metrics(self):
+        operator_price_to_pay = 0
         self.num_winners = len(self.winners)
 
         for i in range(self.num_winners):
             self.num_clients_benefited += self.clients[i].num_neighbours
             self.operator_costs_hubs += self.clients[i].value
+            operator_price_to_pay += self.clients[i].bid.price_to_pay
 
-        self.operator_total_costs = self.operator.bid[0].price_to_pay + self.operator_costs_hubs
+        self.operator_total_costs = operator_price_to_pay + self.operator_costs_hubs
 
         print("\n\n")
         print("SECOND AUCTION - HUBS IDENTIFICATION")
         print("Num hub winners = " + str(self.num_winners))
-        # print("Num clients benefited from hubs (can be repeated) = " + str(self.num_clients_benefited))
+        print("Num clients benefited from hubs (can be repeated) = " + str(self.num_clients_benefited))
         print("Operator's costs with hubs = " + str(self.operator_costs_hubs))
         print("Operator's total costs = " + str(self.operator_total_costs))
 
