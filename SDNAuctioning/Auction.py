@@ -224,7 +224,7 @@ class HubAuction:
                 for k in range(len(self.antenna_services)):
                     if self.clients[i].bid.required_services[j] == self.antenna_services[k]:
                         # quantidade pedida * 2 pra fornecer para demais celulares
-                        if ((self.clients[i].bid.required_service_quantity[j] * 2) +
+                        if ((self.clients[i].bid.required_service_quantity[j]) +
                                 self.clients[i].bid.required_services[j].used_units) <= \
                                 self.antenna_services[k].antenna_capacity:
                             count_services += 1

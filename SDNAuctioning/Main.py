@@ -2,6 +2,7 @@ from SDNAuctioning.Bid import Bid
 from SDNAuctioning.Operator import InfrastructureOperator
 from SDNAuctioning.Operator import NetworkOperator
 from SDNAuctioning import Auction
+from SDNAuctioning import GenerateFile
 from Network.Graph import Graph
 from Network.Node import Node
 from Network.Edge import Edge
@@ -304,7 +305,7 @@ def auctioning(bids, operator):
 
 def main():
 
-    num_clients = 280
+    num_clients = 5600
     num_operators = 5
     operators = []
     bids = []
@@ -317,7 +318,7 @@ def main():
 
     # Resource advertisement phase
     infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=10,
-                                            service_capacity=1000, topology=topology)
+                                            service_capacity=100, topology=topology)
 
     # Operators creation + clients creation + operator's update demands phases
     # 1400. 2800. 5600. 11200. 28000. Divided by num_operators
@@ -327,6 +328,11 @@ def main():
         bids.append(operators[i].bids)
 
     bids = list(itertools.chain(*bids))
+
+    # f = open("gerador_28000.dat", "w+")
+    # print("Criou o arquivo\n")
+    #
+    # GenerateFile.GenerateFile(bids=bids, infra_operator=infra_operator, file=f)
 
     # Winner determination & price computation phase
     auctioning(bids=bids, operator=infra_operator)
