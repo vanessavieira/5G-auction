@@ -5,7 +5,7 @@ import math
 from Network.Dijkstra import shortest_path
 
 
-class Bid:
+class BidGenerator:
     required_service_quantity = []
     total_required_service_quantity = 0
 

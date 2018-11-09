@@ -1,13 +1,13 @@
-from SDNAuctioning.Bid import Bid
-from SDNAuctioning.Operator import InfrastructureOperator
-from SDNAuctioning.Operator import NetworkOperator
-from SDNAuctioning import Auction
-from SDNAuctioning import GenerateFile
+import itertools
+import random
+
+from Network.Edge import Edge
 from Network.Graph import Graph
 from Network.Node import Node
-from Network.Edge import Edge
-import random
-import itertools
+from SDNAuctioning import Auction
+from SDNAuctioning.Operator import InfrastructureOperator
+from SDNAuctioning.Operator import NetworkOperator
+from Data.GenerateFile import GenerateFile
 
 
 def create_network_topology(topology, num_vnf_services):

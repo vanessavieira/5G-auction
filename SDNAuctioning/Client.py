@@ -1,6 +1,6 @@
 from random import uniform
 from random import randint
-from SDNAuctioning import Bid
+from SDNAuctioning import BidGenerator
 
 
 class Client:
@@ -34,7 +34,8 @@ class Client:
         # print("Sort metric:" + str(self.sort_metric))
 
     def compute_bid(self):
-        self.bid = Bid.Bid(self.client_id, self.operator_id, self.infra_operator, self.topology, self.num_clients)
+        self.bid = BidGenerator.BidGenerator(self.client_id, self.operator_id, self.infra_operator,
+                                             self.topology, self.num_clients)
         print(self.bid)
 
     def update_client(self):

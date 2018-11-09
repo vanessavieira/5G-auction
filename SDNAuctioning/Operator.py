@@ -1,6 +1,6 @@
 import itertools
 from SDNAuctioning.Client import Client
-from SDNAuctioning.Bid import Bid
+from SDNAuctioning.BidGenerator import Bid
 from random import randint
 
 
