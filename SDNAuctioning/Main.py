@@ -6,7 +6,9 @@ from Network.Graph import Graph
 from Network.Node import Node
 from SDNAuctioning import Auction
 from SDNAuctioning.Operator import InfrastructureOperator
-from SDNAuctioning.Operator import NetworkOperator
+import Data.Operator
+import SDNAuctioning.Operator
+from Data.Client import Client
 from Data.GenerateFile import GenerateFile
 from Data.ReadFile import ReadFile
 
@@ -318,7 +320,7 @@ def bids_creation(bids_created, infra_operator, operators_created):
 def main():
     num_clients = 280
     num_operators = 5
-    operators_created = []
+    operators = []
     bids_created = []
     topology = Graph()
 
@@ -327,13 +329,13 @@ def main():
 
     # Resource advertisement phase
     infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=5,
-                                            service_capacity=100, topology=topology)
+                                            service_capacity=500, topology=topology)
 
     # Operators creation + clients creation + operator's update demands phases
     # 1400. 2800. 5600. 11200. 28000. Divided by num_operators
 
     # for i in range(num_operators):
-    #     operators_created.append(NetworkOperator(id="operator" + str(i), topology=topology,
+    #     operators_created.append(Data.NetworkOperator(id="operator" + str(i), topology=topology,
     #                                              infra_operator=infra_operator, num_clients=num_clients))
     #     for j in range(num_clients):
     #         bids_created.append(operators_created[i].clients[j].bid)
@@ -344,12 +346,27 @@ def main():
 
     ReadFile(file_greedy=greedy_file, num_bids= num_clients * num_operators, infra_operator=infra_operator)
 
+    for i in range(num_operators):
+        if i == 0:
+            clients_id = ReadFile.clients_operator0
+        elif i == 1:
+            clients_id = ReadFile.clients_operator1
+        elif i == 2:
+            clients_id = ReadFile.clients_operator2
+        elif i == 3:
+            clients_id = ReadFile.clients_operator3
+        elif i == 4:
+            clients_id = ReadFile.clients_operator4
+
+        operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator" + str(i) + "\n", topology=topology,
+                                                                infra_operator=infra_operator, clients_id=clients_id))
+
     # FIRST AUCTION #
     auctioning(bids=ReadFile.bids, operator=infra_operator)
 
-    # for i in range(len(operators)):
-    #     for j in range(len(operators[i].clients)):
-    #         operators[i].clients[j].update_client()
+    for i in range(len(operators)):
+        for j in range(len(operators[i].clients)):
+            operators[i].clients[j].update_client()
 
     # SECOND AUCTION #
 

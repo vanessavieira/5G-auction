@@ -5,6 +5,12 @@ class ReadFile:
     num_operators = []
     bids = []
 
+    clients_operator0 = []
+    clients_operator1 = []
+    clients_operator2 = []
+    clients_operator3 = []
+    clients_operator4 = []
+
     def __init__(self, file_greedy, num_bids, infra_operator):
         self.file_greedy = file_greedy
         self.num_bids = num_bids
@@ -27,6 +33,17 @@ class ReadFile:
             operator_id = self.file_greedy.readline()
             client_id = self.file_greedy.readline()
             num_services = int(self.file_greedy.readline())
+
+            if operator_id == "operator0\n":
+                self.clients_operator0.append(client_id)
+            elif operator_id == "operator1\n":
+                self.clients_operator1.append(client_id)
+            elif operator_id == "operator2\n":
+                self.clients_operator2.append(client_id)
+            elif operator_id == "operator3\n":
+                self.clients_operator3.append(client_id)
+            elif operator_id == "operator4\n":
+                self.clients_operator4.append(client_id)
 
             for j in range(num_services):
                 service_id = int(self.file_greedy.readline())

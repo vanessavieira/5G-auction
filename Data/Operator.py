@@ -1,5 +1,5 @@
 import itertools
-from SDNAuctioning.Client import Client
+from Data.Client import Client
 from random import randint
 
 
@@ -44,19 +44,25 @@ class InfrastructureOperator:
 
 
 class NetworkOperator:
+    bids = []
     clients = []
 
-    def __init__(self, id, topology, infra_operator, clients_id):
+    clients_demands_services = []
+    clients_demands_quantities = []
+
+    def __init__(self, id, topology, infra_operator, num_clients):
         self.id = id
         self.topology = topology
         self.infra_operator = infra_operator
-        self.clients_id = clients_id
+        self.num_clients = num_clients
         self.create_clients()
 
     def create_clients(self):
         self.clients = []
-        for i in range(len(self.clients_id)):
-            self.clients.append(Client(self.clients_id[i],
-                                       self.id, self.topology, len(self.clients_id), self.infra_operator))
+        self.bids = []
+        for i in range(self.num_clients):
+            self.clients.append(Client("Client" + str(i) + "_" + str(self.id),
+                                       self.id, self.topology, self.num_clients, self.infra_operator))
+            self.bids.append(self.clients[i].bid)
         # print(self.clients)
 
