@@ -21,7 +21,7 @@ class Client:
         self.num_clients = num_clients
         self.infra_operator = infra_operator
         self.compute_properties()
-        self.compute_bid()
+        # self.compute_bid()
 
     def compute_properties(self):
         self.distance_to_antenna = uniform(0.1, 3.0)
@@ -36,7 +36,7 @@ class Client:
     def compute_bid(self):
         self.bid = BidGenerator.BidGenerator(self.client_id, self.operator_id, self.infra_operator,
                                              self.topology, self.num_clients)
-        print(self.bid)
+        # print(vars(self.bid))
 
     def update_client(self):
         if self.bid.winning_bid == 1:

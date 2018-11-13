@@ -8,6 +8,7 @@ from SDNAuctioning import Auction
 from SDNAuctioning.Operator import InfrastructureOperator
 from SDNAuctioning.Operator import NetworkOperator
 from Data.GenerateFile import GenerateFile
+from Data.ReadFile import ReadFile
 
 
 def create_network_topology(topology, num_vnf_services):
@@ -303,49 +304,58 @@ def auctioning(bids, operator):
     return auction
 
 
-def main():
+def bids_creation(bids_created, infra_operator, operators_created):
+    optimal_file = open("gerador_" + str(len(bids_created)) + ".dat", "w+")
+    greedy_file = open("greedy_gerador_" + str(len(bids_created)) + ".dat", "w+")
+    print("Loading files...\n")
 
-    num_clients = 5600
+    num_bids = len(bids_created)
+
+    GenerateFile(bids=bids_created, operators=operators_created, infra_operator=infra_operator,
+                 file_optimal=optimal_file, file_greedy=greedy_file, num_bids=num_bids)
+
+
+def main():
+    num_clients = 280
     num_operators = 5
-    operators = []
-    bids = []
+    operators_created = []
+    bids_created = []
     topology = Graph()
 
-    # FIRST AUCTION #
-
     # Create network topology
-    create_network_topology(topology, num_vnf_services=10)
+    create_network_topology(topology, num_vnf_services=5)
 
     # Resource advertisement phase
-    infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=10,
+    infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=5,
                                             service_capacity=100, topology=topology)
 
     # Operators creation + clients creation + operator's update demands phases
     # 1400. 2800. 5600. 11200. 28000. Divided by num_operators
-    for i in range(num_operators):
-        operators.append(NetworkOperator(id="operator" + str(i), topology=topology,
-                                         infra_operator=infra_operator, num_clients=num_clients))
-        bids.append(operators[i].bids)
 
-    bids = list(itertools.chain(*bids))
-
-    # f = open("gerador_28000.dat", "w+")
-    # print("Criou o arquivo\n")
+    # for i in range(num_operators):
+    #     operators_created.append(NetworkOperator(id="operator" + str(i), topology=topology,
+    #                                              infra_operator=infra_operator, num_clients=num_clients))
+    #     for j in range(num_clients):
+    #         bids_created.append(operators_created[i].clients[j].bid)
     #
-    # GenerateFile.GenerateFile(bids=bids, infra_operator=infra_operator, file=f)
+    # bids_creation(bids_created, infra_operator, operators_created)
 
-    # Winner determination & price computation phase
-    auctioning(bids=bids, operator=infra_operator)
+    greedy_file = open("greedy_gerador_" + str(num_clients * num_operators) + ".dat", "r")
 
-    for i in range(num_operators):
-        for j in range(len(operators[i].clients)):
-            operators[i].clients[j].update_client()
+    ReadFile(file_greedy=greedy_file, num_bids= num_clients * num_operators, infra_operator=infra_operator)
+
+    # FIRST AUCTION #
+    auctioning(bids=ReadFile.bids, operator=infra_operator)
+
+    # for i in range(len(operators)):
+    #     for j in range(len(operators[i].clients)):
+    #         operators[i].clients[j].update_client()
 
     # SECOND AUCTION #
 
-    random_operator = random.choice(operators)
-
-    Auction.HubAuction(operator=random_operator, clients=random_operator.clients)
+    # random_operator = random.choice(operators)
+    #
+    # Auction.HubAuction(operator=random_operator, clients=random_operator.clients)
 
 
 if __name__ == "__main__":

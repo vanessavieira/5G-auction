@@ -36,7 +36,8 @@ class SDNAuction:
     def compute_ordered_bids(self):
         self.bids.sort(key=lambda x: x.sort_metric, reverse=True)
         for i in range(len(self.bids)):
-            print(self.bids[i].network_operator)
+            print(self.bids[i].sort_metric)
+            print(self.bids[i].client)
 
     def compute_winning_bids(self):
 
@@ -46,7 +47,7 @@ class SDNAuction:
             count_services = 0
             for j in range(num_services):
                 if (self.bids[i].required_service_quantity[j] + self.bids[i].required_services[j].used_units) \
-                        <= self.bids[i].operator.service_capacity:
+                        <= self.operator.service_capacity:
                     count_services += 1
 
             if count_services == num_services:
@@ -56,7 +57,7 @@ class SDNAuction:
                     self.bids[i].required_services[j].used_units += self.bids[i].required_service_quantity[j]
 
         for i in range(len(self.winners)):
-            print("Winner: " + str(self.winners[i].network_operator) + "; valuation: " + str(self.winners[i].valuation))
+            print("Winner: " + str(self.winners[i].client) + "; valuation: " + str(self.winners[i].valuation))
 
         print("\n")
 
@@ -64,7 +65,7 @@ class SDNAuction:
         self.services = self.operator.services
 
         for winner in self.winners:
-            winner.price_to_pay = winner.valuation
+            winner.price_to_pay = 0
 
         for i in range(len(self.winners)):
 
@@ -77,17 +78,14 @@ class SDNAuction:
                 count_services = 0
                 count_bigger_capacity = 0
 
-                # if self.bids[k] == self.winners[i]:
-                #     continue
-
                 if self.bids[k] != self.winners[i]:
 
                     num_services = len(self.bids[k].required_services)
 
                     for service in range(num_services):
-                        if self.bids[k].required_service_quantity[service] +\
-                                self.bids[k].required_services[service].used_units\
-                                <= self.bids[k].operator.service_capacity:
+                        if self.bids[k].required_service_quantity[service] + \
+                                self.bids[k].required_services[service].used_units \
+                                <= self.operator.service_capacity:
                             count_services += 1
 
                     if count_services == num_services:
@@ -96,16 +94,18 @@ class SDNAuction:
                                 self.bids[k].required_service_quantity[service]
 
                     for j in range(len(self.winners[i].required_services)):
-                        if self.winners[i].required_service_quantity[j] + self.winners[i].required_services[j].used_units >= \
-                                self.winners[i].operator.service_capacity:
+                        if self.winners[i].required_service_quantity[j] + \
+                                self.winners[i].required_services[j].used_units >= \
+                                self.operator.service_capacity:
                             count_bigger_capacity += 1
 
-                            price = (self.bids[k].valuation * math.sqrt(self.winners[i].total_required_service_quantity)) / \
-                                    math.sqrt(self.bids[k].total_required_service_quantity)
+                            price = (self.bids[k].valuation *
+                                     math.sqrt(self.winners[i].total_required_service_quantity))\
+                                     / math.sqrt(self.bids[k].total_required_service_quantity)
 
                             self.winners[i].price_to_pay = price
 
-                            #print("winner: " + str(self.winners[i].client) + "; ordem i: " + str(i) + "; ordem k: " + str(k))
+                            # print("winner: " + str(self.winners[i].client) + "; ordem i: " + str(i) + "; ordem k: " + str(k))
 
                             self.prices.append(price)
                             break
@@ -115,7 +115,7 @@ class SDNAuction:
 
         print("\n")
         for i in range(len(self.winners)):
-            print("Price " + str(self.winners[i].network_operator) + ": " + str(self.winners[i].price_to_pay))
+            print("Price " + str(self.winners[i].client) + ": " + str(self.winners[i].price_to_pay))
             # print("price: " + str(self.prices[i]))
 
     def compute_metrics(self):
@@ -140,15 +140,17 @@ class SDNAuction:
             self.operator_revenue += self.winners[j].price_to_pay
             self.winners[j].winning_bid = 1
 
-            if self.winners[j].network_operator == "operator0":
+            print("network operator: " + str(self.winners[j].network_operator))
+
+            if self.winners[j].network_operator == "operator0\n":
                 self.counter_operator0 += 1
-            elif self.winners[j].network_operator == "operator1":
+            elif self.winners[j].network_operator == "operator1\n":
                 self.counter_operator1 += 1
-            elif self.winners[j].network_operator == "operator2":
+            elif self.winners[j].network_operator == "operator2\n":
                 self.counter_operator2 += 1
-            elif self.winners[j].network_operator == "operator3":
+            elif self.winners[j].network_operator == "operator3\n":
                 self.counter_operator3 += 1
-            elif self.winners[j].network_operator == "operator4":
+            elif self.winners[j].network_operator == "operator4\n":
                 self.counter_operator4 += 1
 
         self.mean_bid_price = self.operator_revenue / self.accepted_bids
