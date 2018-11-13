@@ -46,17 +46,21 @@ class InfrastructureOperator:
 class NetworkOperator:
     clients = []
 
-    def __init__(self, id, topology, infra_operator, clients_id):
+    def __init__(self, id, topology, infra_operator, clients_id, bids):
         self.id = id
         self.topology = topology
         self.infra_operator = infra_operator
         self.clients_id = clients_id
+        self.bids = bids
         self.create_clients()
 
     def create_clients(self):
         self.clients = []
         for i in range(len(self.clients_id)):
-            self.clients.append(Client(self.clients_id[i],
-                                       self.id, self.topology, len(self.clients_id), self.infra_operator))
+            for j in range(len(self.bids)):
+                if self.clients_id[i] == self.bids[j].client:
+                    self.clients.append(Client(self.clients_id[i],
+                                               self.id, self.topology, len(self.clients_id), self.infra_operator,
+                                               self.bids[j]))
         # print(self.clients)
 

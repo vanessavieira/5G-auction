@@ -35,9 +35,9 @@ class SDNAuction:
 
     def compute_ordered_bids(self):
         self.bids.sort(key=lambda x: x.sort_metric, reverse=True)
-        for i in range(len(self.bids)):
-            print(self.bids[i].sort_metric)
-            print(self.bids[i].client)
+        # for i in range(len(self.bids)):
+        #     print(self.bids[i].sort_metric)
+        #     print(self.bids[i].client)
 
     def compute_winning_bids(self):
 

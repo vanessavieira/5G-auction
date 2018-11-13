@@ -22,7 +22,7 @@ class Client:
         self.num_clients = num_clients
         self.infra_operator = infra_operator
         self.compute_properties()
-        # self.compute_bid()
+        self.compute_bid()
 
     def compute_properties(self):
         self.distance_to_antenna = uniform(0.1, 3.0)

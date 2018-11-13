@@ -321,6 +321,7 @@ def main():
     num_clients = 280
     num_operators = 5
     operators = []
+    operators_created = []
     bids_created = []
     topology = Graph()
 
@@ -331,16 +332,20 @@ def main():
     infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=5,
                                             service_capacity=500, topology=topology)
 
+    ## CREATING FILES ##
+
     # Operators creation + clients creation + operator's update demands phases
     # 1400. 2800. 5600. 11200. 28000. Divided by num_operators
 
     # for i in range(num_operators):
-    #     operators_created.append(Data.NetworkOperator(id="operator" + str(i), topology=topology,
-    #                                              infra_operator=infra_operator, num_clients=num_clients))
+    #     operators_created.append(Data.Operator.NetworkOperator(id="operator" + str(i), topology=topology,
+    #                                                            infra_operator=infra_operator, num_clients=num_clients))
     #     for j in range(num_clients):
     #         bids_created.append(operators_created[i].clients[j].bid)
     #
     # bids_creation(bids_created, infra_operator, operators_created)
+
+    ## READING FILE ##
 
     greedy_file = open("greedy_gerador_" + str(num_clients * num_operators) + ".dat", "r")
 
@@ -359,19 +364,20 @@ def main():
             clients_id = ReadFile.clients_operator4
 
         operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator" + str(i) + "\n", topology=topology,
-                                                                infra_operator=infra_operator, clients_id=clients_id))
+                                                                infra_operator=infra_operator, clients_id=clients_id,
+                                                                bids=ReadFile.bids))
 
     # FIRST AUCTION #
     auctioning(bids=ReadFile.bids, operator=infra_operator)
 
-    for i in range(len(operators)):
-        for j in range(len(operators[i].clients)):
-            operators[i].clients[j].update_client()
-
-    # SECOND AUCTION #
+    # for i in range(len(operators)):
+    #     for j in range(len(operators[i].clients)):
+    #         operators[i].clients[j].update_client()
+    
+    # # SECOND AUCTION #
 
     # random_operator = random.choice(operators)
-    #
+
     # Auction.HubAuction(operator=random_operator, clients=random_operator.clients)
 
 
