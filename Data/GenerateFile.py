@@ -25,13 +25,14 @@ class GenerateFile:
 
             for k in range(len(self.bids)):
                 flag = False
-                count = 0
 
-                for v in self.bids[k].required_services:
-                    if v == self.infra_operator.services[j]:
-                        self.file_optimal.write(str(self.bids[k].required_service_quantity[count]) + "\r\n")
+                for v in range(len(self.bids[k].required_services)):
+                   # print(self.bids[k].required_services[v])
+
+                    if self.bids[k].required_services[v] == self.infra_operator.services_id[j]:
+                        print(self.bids[k].required_services[v])
+                        self.file_optimal.write(str(self.bids[k].required_service_quantity[v]) + "\r\n")
                         flag = True
-                    count += 1
 
                 if not flag:
                     self.file_optimal.write("0\r\n")

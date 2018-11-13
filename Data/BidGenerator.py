@@ -90,7 +90,7 @@ class BidGenerator:
     def compute_all_services_request(self):
         self.required_service_quantity = []
         for services in range(len(self.required_services)):
-            rand_quantity = randint(1, 15)
+            rand_quantity = randint(1, 45)
             self.total_required_service_quantity += rand_quantity
             self.required_service_quantity.append(rand_quantity)
 
