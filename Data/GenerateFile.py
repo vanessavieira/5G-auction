@@ -1,13 +1,14 @@
 class GenerateFile:
 
-    def __init__(self, bids, operators, infra_operator, file_optimal, file_greedy, num_bids):
+    def __init__(self, bids, operators, infra_operator, file_optimal, file_greedy, num_bids, seed):
         self.bids = bids
         self.operators = operators
         self.infra_operator = infra_operator
         self.file_optimal = file_optimal
         self.file_greedy = file_greedy
         self.num_bids = num_bids
-        self.create_instances_optimal()
+        self.seed = seed
+        # self.create_instances_optimal()
         self.create_instances_greedy()
 
     def create_instances_optimal(self):
@@ -30,7 +31,7 @@ class GenerateFile:
                    # print(self.bids[k].required_services[v])
 
                     if self.bids[k].required_services[v] == self.infra_operator.services_id[j]:
-                        print(self.bids[k].required_services[v])
+                        # print(self.bids[k].required_services[v])
                         self.file_optimal.write(str(self.bids[k].required_service_quantity[v]) + "\r\n")
                         flag = True
 
@@ -45,7 +46,7 @@ class GenerateFile:
 
     def create_instances_greedy(self):
         print("Generating greedy instances file...\n")
-        self.file_greedy = open("greedy_gerador_" + str(self.num_bids) + ".dat", "a+")
+        self.file_greedy = open("greedy_gerador_" + str(self.num_bids) + "_" + str(self.seed) + ".dat", "a+")
 
         self.file_greedy.write(str(len(self.bids)) + "\r\n")
 

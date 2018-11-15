@@ -9,9 +9,11 @@ from SDNAuctioning.Operator import InfrastructureOperator
 from statistics import mean
 import Data.Operator
 import SDNAuctioning.Operator
+from sys import argv
 from Data.Client import Client
 from Data.GenerateFile import GenerateFile
 from Data.ReadFile import ReadFile
+from Data.ManageResults import ManageResults
 
 
 def create_network_topology(topology, num_vnf_services):
@@ -303,37 +305,51 @@ def create_network_topology(topology, num_vnf_services):
 
 def auctioning(bids, operator):
     auction = Auction.SDNAuction(bids, operator)
-    # bids.clear()
+    bids.clear()
     return auction
 
 
-def bids_creation(bids_created, infra_operator, operators_created):
+def bids_creation(bids_created, infra_operator, operators_created, seed):
     optimal_file = open("gerador_" + str(len(bids_created)) + ".dat", "w+")
-    greedy_file = open("greedy_gerador_" + str(len(bids_created)) + ".dat", "w+")
+    greedy_file = open("greedy_gerador_" + str(len(bids_created)) + "_" + str(seed) + ".dat", "w+")
     print("Loading files...\n")
 
     num_bids = len(bids_created)
 
     GenerateFile(bids=bids_created, operators=operators_created, infra_operator=infra_operator,
-                 file_optimal=optimal_file, file_greedy=greedy_file, num_bids=num_bids)
+                 file_optimal=optimal_file, file_greedy=greedy_file, num_bids=num_bids, seed=seed)
 
 
-def main():
-    num_clients = 2240
+def main(argv):
+
+    script, clients, seed_1 = argv
+
+    # num_clients = 560
     num_operators = 5
     operators = []
     operators_created = []
     bids_created = []
     topology = Graph()
+    # seed = 1
+
+    num_clients = int(clients)
+    num_clients_operator = num_clients * num_operators
+    seed = int(seed_1)
+
+    print("num_clients : " + str(num_clients))
+    print("seed : " + str(seed))
+    print("num_clients * num_operators: " + str(num_clients_operator))
+
+    random.seed(seed)
 
     # Create network topology
     create_network_topology(topology, num_vnf_services=5)
 
     # Resource advertisement phase
     infra_operator = InfrastructureOperator(num_nodes=27, num_links=36, num_vnf_services=5,
-                                            service_capacity=100, topology=topology)
+                                            service_capacity=500, topology=topology)
 
-    flag = 1
+    flag = 2
 
     ## CREATING FILES ##
 
@@ -343,100 +359,86 @@ def main():
 
         for i in range(num_operators):
             operators_created.append(Data.Operator.NetworkOperator(id="operator" + str(i), topology=topology,
-                                                                   infra_operator=infra_operator, num_clients=num_clients))
+                                                                   infra_operator=infra_operator,
+                                                                   num_clients=num_clients))
             for j in range(num_clients):
                 bids_created.append(operators_created[i].clients[j].bid)
 
-        bids_creation(bids_created, infra_operator, operators_created)
+        bids_creation(bids_created, infra_operator, operators_created, seed)
 
     ## READING FILE ##
 
     elif flag == 2:
 
-        greedy_file = open("greedy_gerador_" + str(num_clients * num_operators) + ".dat", "r")
+        greedy_file = open("SDNAuctioning/greedy_gerador_" + str(num_clients * num_operators) + "_" + str(seed) + ".dat", "r")
 
-        ReadFile(file_greedy=greedy_file, num_bids= num_clients * num_operators, infra_operator=infra_operator)
+        ReadFile(file_greedy=greedy_file, num_bids=num_clients * num_operators, infra_operator=infra_operator, seed=seed)
 
-        for i in range(num_operators):
-            if i == 0:
-                clients_id = ReadFile.clients_operator0
-            elif i == 1:
-                clients_id = ReadFile.clients_operator1
-            elif i == 2:
-                clients_id = ReadFile.clients_operator2
-            elif i == 3:
-                clients_id = ReadFile.clients_operator3
-            elif i == 4:
-                clients_id = ReadFile.clients_operator4
+        operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator0\n", topology=topology,
+                                                                infra_operator=infra_operator,
+                                                                clients_id=ReadFile.clients_operator0,
+                                                                bids=ReadFile.bids))
 
-            operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator" + str(i) + "\n", topology=topology,
-                                                                    infra_operator=infra_operator, clients_id=clients_id,
-                                                                    bids=ReadFile.bids))
+        operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator1\n", topology=topology,
+                                                                infra_operator=infra_operator,
+                                                                clients_id=ReadFile.clients_operator1,
+                                                                bids=ReadFile.bids))
+
+        operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator2\n", topology=topology,
+                                                                infra_operator=infra_operator,
+                                                                clients_id=ReadFile.clients_operator2,
+                                                                bids=ReadFile.bids))
+
+        operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator3\n", topology=topology,
+                                                                infra_operator=infra_operator,
+                                                                clients_id=ReadFile.clients_operator3,
+                                                                bids=ReadFile.bids))
+
+        operators.append(SDNAuctioning.Operator.NetworkOperator(id="operator4\n", topology=topology,
+                                                                infra_operator=infra_operator,
+                                                                clients_id=ReadFile.clients_operator4,
+                                                                bids=ReadFile.bids))
 
         # FIRST AUCTION #
-        results = open("results_greedy_" + str(num_clients * num_operators) + ".dat", "a+")
+        results = open("SDNAuctioning/results_greedy_" + str(num_clients * num_operators) + "_" + str(seed) + ".dat", "a+")
 
-        accepted_bids = []
-        market_valuation = []
-        operator_revenue = []
-        accepted_bids_percentage = []
-        mean_bid_price = []
-        op0 = []
-        op1 = []
-        op2 = []
-        op3 = []
-        op4 = []
+        auction = auctioning(bids=ReadFile.bids, operator=infra_operator)
 
-        for i in range(10):
-            auction = auctioning(bids=ReadFile.bids, operator=infra_operator)
-
-            accepted_bids.append(auction.accepted_bids)
-            market_valuation.append(auction.market_valuation)
-            operator_revenue.append(auction.operator_revenue)
-            accepted_bids_percentage.append(auction.accepted_bids_percentage)
-            mean_bid_price.append(auction.mean_bid_price)
-            op0.append(auction.counter_operator0)
-            op1.append(auction.counter_operator1)
-            op2.append(auction.counter_operator2)
-            op3.append(auction.counter_operator3)
-            op4.append(auction.counter_operator4)
-
-            results.write("Results #" + str(i) + "\r\n")
-            results.write("accepted bids: " + str(auction.accepted_bids) + "\r\n")
-            results.write("market valuation: " + str(auction.market_valuation) + "\r\n")
-            results.write("infrastructure revenue: " + str(auction.operator_revenue) + "\r\n")
-            results.write("percentage of accepted bids: " + str(auction.accepted_bids_percentage) + "\r\n")
-            results.write("mean bid price: " + str(auction.mean_bid_price) + "\r\n")
-            results.write("op0: " + str(auction.counter_operator0) + "\r\n")
-            results.write("op1: " + str(auction.counter_operator1) + "\r\n")
-            results.write("op2: " + str(auction.counter_operator2) + "\r\n")
-            results.write("op3: " + str(auction.counter_operator3) + "\r\n")
-            results.write("op4: " + str(auction.counter_operator4) + "\r\n\r\n")
-
-        results.write("Log \r\n")
-        results.write("accepted_bids_" + str(num_clients * num_operators) + " =" + str(accepted_bids) + "\r\n")
-        results.write("market_valuation_" + str(num_clients * num_operators) + " =" + str(market_valuation) + "\r\n")
-        results.write("infrastructure_revenue_" + str(num_clients * num_operators) + " =" + str(operator_revenue) + "\r\n")
-        results.write("percentage_accepted_bids_" + str(num_clients * num_operators) + " =" + str(accepted_bids_percentage) + "\r\n")
-        results.write("mean_bid_price_" + str(num_clients * num_operators) + " =" + str(mean_bid_price) + "\r\n")
-        results.write("op0_" + str(num_clients * num_operators) + " =" + str(op0) + "\r\n")
-        results.write("op1_" + str(num_clients * num_operators) + " =" + str(op1) + "\r\n")
-        results.write("op2_" + str(num_clients * num_operators) + " =" + str(op2) + "\r\n")
-        results.write("op3_" + str(num_clients * num_operators) + " =" + str(op3) + "\r\n")
-        results.write("op4_" + str(num_clients * num_operators) + " =" + str(op4) + "\r\n\r\n")
-
-        results.close()
-
-        # for i in range(len(operators)):
-        #     for j in range(len(operators[i].clients)):
-        #         operators[i].clients[j].update_client()
+        results.write(str(auction.accepted_bids) + "\r\n")
+        results.write(str(auction.market_valuation) + "\r\n")
+        results.write(str(auction.operator_revenue) + "\r\n")
+        results.write(str(auction.accepted_bids_percentage) + "\r\n")
+        results.write(str(auction.mean_bid_price) + "\r\n")
+        results.write(str(auction.counter_operator0) + "\r\n")
+        results.write(str(auction.counter_operator1) + "\r\n")
+        results.write(str(auction.counter_operator2) + "\r\n")
+        results.write(str(auction.counter_operator3) + "\r\n")
+        results.write(str(auction.counter_operator4) + "\r\n")
 
         # # SECOND AUCTION #
 
-        # random_operator = random.choice(operators)
+        for i in range(len(operators)):
+            for j in range(len(operators[i].clients)):
+                operators[i].clients[j].update_client()
 
-        # Auction.HubAuction(operator=random_operator, clients=random_operator.clients)
+        random_operator = random.choice(operators)
 
+        # print(random_operator.clients)
+
+        second_auction = Auction.HubAuction(operator=random_operator, clients=random_operator.clients)
+
+        results.write(str(second_auction.num_winners) + "\r\n")
+        results.write(str(second_auction.operator_costs_hubs) + "\r\n")
+        results.write(str(second_auction.operator_price_to_pay) + "\r\n")
+
+        results.close()
+
+    ## ORGANIZING RESULTS ##
+
+    elif flag == 3:
+        results_file = open("SDNAuctioning/results_greedy_" + str(num_clients * num_operators) + "_"
+                             + str(seed) + ".dat","r")
+        ManageResults(num_bids=num_clients, num_operators=num_operators,file=results_file)
 
 if __name__ == "__main__":
-    main()
+    main(argv)

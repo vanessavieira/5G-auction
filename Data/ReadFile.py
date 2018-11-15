@@ -11,16 +11,17 @@ class ReadFile:
     clients_operator3 = []
     clients_operator4 = []
 
-    def __init__(self, file_greedy, num_bids, infra_operator):
+    def __init__(self, file_greedy, num_bids, infra_operator, seed):
         self.file_greedy = file_greedy
         self.num_bids = num_bids
         self.infra_operator = infra_operator
+        self.seed = seed
         self.read_greedy_file()
 
     def read_greedy_file(self):
 
         print("Reading file...")
-        self.file_greedy = open("greedy_gerador_" + str(self.num_bids) + ".dat", "r")
+        self.file_greedy = open("SDNAuctioning/greedy_gerador_" + str(self.num_bids) + "_" + str(self.seed) + ".dat", "r")
 
         self.num_bids = int(self.file_greedy.readline())
         self.num_operators = int(self.file_greedy.readline())

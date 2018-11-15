@@ -19,6 +19,8 @@ class BidGenerator:
     valuation = 0
     sort_metric = 0
 
+    random.seed(7)
+
     def __init__(self, client, network_operator, operator, topology, num_clients):
         self.client = client
         self.network_operator = network_operator
@@ -90,7 +92,7 @@ class BidGenerator:
     def compute_all_services_request(self):
         self.required_service_quantity = []
         for services in range(len(self.required_services)):
-            rand_quantity = randint(1, 45)
+            rand_quantity = randint(1, 15)
             self.total_required_service_quantity += rand_quantity
             self.required_service_quantity.append(rand_quantity)
 
